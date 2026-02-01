@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Yes / No Fun Page</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+      position: relative;
+      background: url("background.png") no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    h1{
+      font-weight: bold;
+      color:#fff;
+      font-size: 56px
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      color: #fff;
+    }
+
+    .buttons {
+      margin-top: 20px;
+      display: inline-flex;
+      gap: 20px;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
+      cursor: pointer;
+      border-radius: 6px;
+      border: none;
+    }
+
+    #yesBtn {
+      position: relative;
+      z-index: 2;
+      background-color: #4caf50;
+      color: #fff;
+    }
+
+    /* Start as a normal inline-flex button so it's perfectly next to Yes */
+    #noBtn {
+      position: relative;      /* CHANGED from absolute */
+      margin-left: 0;          /* inline-flex + gap handles spacing */
+      background-color: #f44336;
+      color: #fff;
+      transition: left 0.08s linear, top 0.08s linear;
+      z-index: 2;
+    }
+
+    #gifContainer {
+      display: none;
+      margin-top: 20px;
+    }
+
+    #gifContainer img {
+      max-width: 320px;
+      width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.6);
+    }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <h1>Will you be my valentine? 🎀💗💘💝🎀</h1>
+
+    <div class="buttons" id="buttonsWrapper">
+      <button id="yesBtn">Yes</button>
+      <button id="noBtn">No</button>
+    </div>
+
+    <div id="gifContainer">
+      <img src="yes.gif" alt="Funny GIF" />
+    </div>
+  </div>
+
+  <script>
+    const noBtn = document.getElementById("noBtn");
+    const yesBtn = document.getElementById("yesBtn");
+    const buttonsWrapper = document.getElementById("buttonsWrapper");
+    const gifContainer = document.getElementById("gifContainer");
+
+    const safeRadius = 120;
+    const moveStep = 80;
+
+    function ensureFixedPosition() {
+      // After the first move, switch to fixed so it can roam
+      if (noBtn.style.position !== "fixed") {
+        const rect = noBtn.getBoundingClientRect();
+        noBtn.style.position = "fixed";
+        noBtn.style.left = rect.left + "px";
+        noBtn.style.top = rect.top + "px";
+      }
+    }
+
+    function moveNoButtonAway(mouseX, mouseY) {
+      const btnRect = noBtn.getBoundingClientRect();
+      const btnCenterX = btnRect.left + btnRect.width / 2;
+      const btnCenterY = btnRect.top + btnRect.height / 2;
+
+      const dx = mouseX - btnCenterX;
+      const dy = mouseY - btnCenterY;
+      const distance = Math.hypot(dx, dy);
+
+      if (distance > safeRadius) return;
+
+      ensureFixedPosition();
+
+      const nx = -dx / distance;
+      const ny = -dy / distance;
+
+      const currentLeft = btnRect.left;
+      const currentTop = btnRect.top;
+
+      let newLeft = currentLeft + nx * moveStep;
+      let newTop = currentTop + ny * moveStep;
+
+      const maxLeft = window.innerWidth - btnRect.width;
+      const maxTop = window.innerHeight - btnRect.height;
+
+      if (newLeft < 0) newLeft = 0;
+      if (newTop < 0) newTop = 0;
+      if (newLeft > maxLeft) newLeft = maxLeft;
+      if (newTop > maxTop) newTop = maxTop;
+
+      noBtn.style.left = newLeft + "px";
+      noBtn.style.top = newTop + "px";
+    }
+
+    window.addEventListener("mousemove", (e) => {
+      moveNoButtonAway(e.clientX, e.clientY);
+    });
+
+    noBtn.addEventListener("mouseenter", (e) => {
+      moveNoButtonAway(e.clientX, e.clientY);
+    });
+
+    yesBtn.addEventListener("click", () => {
+      buttonsWrapper.style.display = "none";
+      gifContainer.style.display = "block";
+    });
+  </script>
+</body>
+</html>
